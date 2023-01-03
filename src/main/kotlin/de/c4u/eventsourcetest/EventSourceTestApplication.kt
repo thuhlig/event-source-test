@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class EventSourceTestApplication
 
 fun main(args: Array<String>) {
-	runApplication<EventSourceTestApplication>(*args)
+    runApplication<EventSourceTestApplication>(*args)
 }

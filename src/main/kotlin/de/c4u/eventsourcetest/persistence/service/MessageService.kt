@@ -5,16 +5,15 @@ import de.c4u.eventsourcetest.persistence.repository.MessageRepository
 import de.c4u.eventsourcetest.web.dto.MessageRequest
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
+import java.util.*
 
 @Service
 class MessageService(val messageRepository: MessageRepository) {
 
     fun save(request: MessageRequest) {
-        val message = Message()
-        message.name = request.name
-        message.message = request.message
+        val message = Message(UUID.randomUUID().toString(), request.name, request.message)
 
-        this.messageRepository.save(message)
+        this.messageRepository.save(message).subscribe()
     }
 
     fun findAll(): Flux<Message> = this.messageRepository.findAll()

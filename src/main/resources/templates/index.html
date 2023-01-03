@@ -7,37 +7,93 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
 
+    <style>
+        .grid-container {
+            width: fit-content;
+            display: grid;
+            grid-template-columns: auto auto;
+        }
+
+        .grid-container * {
+            margin: 5px;
+            padding: 5px;
+        }
+    </style>
 </head>
 <body>
 <div>
-<h1>Events:</h1>
+    <h1>Messages:</h1>
 </div>
-<div>
+<div class="grid-container">
     <label for="name">Name</label>
     <input type="text" id="name" name="name" placeholder="Please enter your name">
 
     <label for="message">Message</label>
     <textarea type="text" id="message" name="message" placeholder="Please enter your message"></textarea>
 
+    <div></div>
     <button type="button" id="sendMessage">send message!</button>
 </div>
-<ul></ul>
+<table>
+    <thead>
+    <tr>
+        <th>Id</th>
+        <th>Name</th>
+        <th>Message</th>
+    </tr>
+    </thead>
+    <tbody></tbody>
+</table>
 </body>
 </html>
 <script>
-  const evtSource = new EventSource('/messages');
-  const eventList = document.querySelector('ul');
+    const evtSource = new EventSource('/messages')
+    const messageList = document.querySelector('tbody')
 
-  evtSource.onmessage = (e) => {
-    const newElement = document.createElement("li");
+    const messages = {}
 
-    newElement.textContent = `message: ${e.data}`;
-    eventList.appendChild(newElement);
-  }
+    evtSource.onmessage = (e) => {
+        const data = JSON.parse(e.data)
+
+        if (messages[data.id])
+            return
+
+        messages[data.id] = data
+
+        const newRow = document.createElement("tr")
+
+        const newId = document.createElement("td")
+        newId.textContent = data.id
+
+        const newName = document.createElement("td")
+        newName.textContent = data.name
+
+        const newMessage = document.createElement("td")
+        newMessage.textContent = data.message
+
+        newRow.append(newId, newName, newMessage)
+
+        messageList.appendChild(newRow);
+    }
 </script>
 
 <script>
-  document.getElementById('sendMessage').addEventListener('click', () => {
-    console.log("foobar")
-  })
+    document.getElementById('sendMessage').addEventListener('click', () => {
+        const name = document.getElementById("name").value
+        const message = document.getElementById("message").value
+
+        fetch('/', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "name": name,
+                "message": message
+            })
+        })
+            .then(response => response.json())
+            .then(response => console.log(JSON.stringify(response)))
+    })
 </script>
