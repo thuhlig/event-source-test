@@ -1,0 +1,5 @@
+event:
+  source:
+    test:
+      port: 27017
+      dbname: testdb
